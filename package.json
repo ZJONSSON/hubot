@@ -1,0 +1,44 @@
+{
+  "name": "hubot",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Harrison Powers <fijimunkii@gmail.com>",
+  "description": "A simple helpful robot for your Company",
+  "scripts": {
+    "hubot": "hubot"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.30",
+    "cheerio": "^0.18.0",
+    "circleci": "^0.2.0",
+    "hubot": "^2.11.0",
+    "hubot-auth": "^1.2.0",
+    "hubot-business-cat": "^1.1.10",
+    "hubot-circleci": "^0.8.1",
+    "hubot-diagnostics": "0.0.1",
+    "hubot-dogeme": "^1.0.0",
+    "hubot-google-images": "^0.1.2",
+    "hubot-google-translate": "^0.1.0",
+    "hubot-help": "^0.1.1",
+    "hubot-heroku-keepalive": "0.0.4",
+    "hubot-maps": "0.0.1",
+    "hubot-plusplus": "^1.1.2",
+    "hubot-pugme": "^0.1.0",
+    "hubot-redis-brain": "0.0.2",
+    "hubot-rules": "^0.1.0",
+    "hubot-scripts": "^2.5.16",
+    "hubot-seriouslyguys": "^1.0.0",
+    "hubot-shipit": "^0.1.1",
+    "hubot-slack": "^3.2.1",
+    "hubot-tell": "^1.2.3",
+    "hubot-thank-you": "0.0.3",
+    "hubot-youtube": "^0.1.2",
+    "jsdom": "^2.0.0",
+    "lodash": "^3.10.1",
+    "nconf": "^0.8.0",
+    "xml2js": "^0.4.4"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
