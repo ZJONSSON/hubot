@@ -4,10 +4,10 @@ var execAsync = Promise.promisify(require('child_process').exec);
 var env = require('nconf').argv().env().file({ file: './config.json' });
 
 module.exports = function(hubot) {
-  hubot.router.post('/hubot/deploy/:user/:repo/:branch', function(req, res) {
-    var user = req.params.user;
-    var repo = req.params.repo;
-    var branch = req.params.branch;
+  hubot.router.post('/hubot/deploy', function(req, res) {
+    var user = req.body.payload.username;
+    var repo = req.body.payload.reponame;
+    var branch = req.body.payload.branch;
     deploy({ user:user, repo:repo, branch:branch, res:res });
   });
 
