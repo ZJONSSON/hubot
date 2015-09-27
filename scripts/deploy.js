@@ -25,9 +25,12 @@ function deploy(options) {
   var branch = options.branch;
   var res = options.res;
 
-  if (!env.get(user+'/'+repo))
+  if (!env.get(user+'/'+repo)) {
+    console.log(user+'/'+repo+' not found in config');
     return res.send(user+'/'+repo+' not found in config');
-
+  }
+  
+  console.log('Deploying ' + branch + ' to ' + target);
   res.send('Deploying ' + branch + ' to ' + target);
 
   var ci = new CircleCI({
