@@ -1,7 +1,7 @@
 var CircleCI = require('circleci');
 var Promise = require('bluebird');
 var execAsync = Promise.promisify(require('child_process').exec);
-var env = require('nconf').argv().env().file({ file: './config.json' });
+var env = require('nconf').argv().env().file('default', 'config.json');
 
 module.exports = function(hubot) {
   hubot.router.post('/hubot/deploy', function(req, res) {
@@ -30,8 +30,8 @@ function deploy(options) {
     return res.send(user+'/'+repo+' not found in config');
   }
   
-  console.log('Deploying ' + branch + ' to ' + target);
-  res.send('Deploying ' + branch + ' to ' + target);
+  console.log('Deploying '+user+'/'+repo+'#'+branch);
+  res.send('Deploying '+user+'/'+repo+'#'+branch);
 
   var ci = new CircleCI({
     'auth': env.get(user+'/'+repo+':ciToken')
