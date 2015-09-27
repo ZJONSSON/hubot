@@ -57,13 +57,15 @@ function deploy(options) {
     return build;
   })
   .then(function(build) {
-    var artifacts = ci.getBuildArtifacts({
-      'username': user,
-      'project': repo,
-      'build_num': build.build_num
+    return new Promise(function(resolve, reject) {
+      ci.getBuildArtifacts({
+        'username': user,
+        'project': repo,
+        'build_num': build.build_num
+      }).then(function(artifacts) {
+        resolve([artifacts, build]);
+      });
     });
-
-    return [artifacts, build];
   })
   .spread(function(artifacts, build) {
     if (!artifacts || !artifacts.length) throw 'Failed to find artifacts';
