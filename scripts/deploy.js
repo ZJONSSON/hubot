@@ -2,6 +2,7 @@ var CircleCI = require('circleci');
 var Promise = require('bluebird');
 var execAsync = Promise.promisify(require('child_process').exec);
 var env = require('nconf').argv().env().file('default', 'config.json');
+var deploySync = {};
 
 module.exports = function(hubot) {
   hubot.router.post('/hubot/deploy', function(req, res) {
@@ -25,9 +26,14 @@ function deploy(options) {
   var branch = options.branch;
   var res = options.res;
 
+  if (deploySync[user+repo+branch]) return;
+  deploySync[user+repo+branch] = true;
+
   if (!env.get(user+'/'+repo)) {
     console.log(user+'/'+repo+' not found in config');
-    return res.send(user+'/'+repo+' not found in config');
+    res.send(user+'/'+repo+' not found in config');
+    delete deploySync[user+repo+branch];
+    return;
   }
   
   console.log('Deploying '+user+'/'+repo+'#'+branch);
@@ -103,10 +109,12 @@ function deploy(options) {
     if (output.join('').indexOf('SHA OK') === -1) {
       res.send(user+ + '/' + branch + ' failed verification');
     }
+    delete deploySync[user+repo+branch];
   })
   .catch(function(err) {
     console.error('Deployment failed');
     console.log(err);
     res.send('Deployment failed: ' + err);
+    delete deploySync[user+repo+branch];
   });
 }
