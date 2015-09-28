@@ -104,7 +104,6 @@ function deploy(options) {
     ].join(' '));
   })
   .then(function(output) {
-    console.log(output);
     res.send(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
       (branch&&branch+'.')+env.get(user+'/'+repo+':server'));
     console.log(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
