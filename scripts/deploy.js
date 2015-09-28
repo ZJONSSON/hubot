@@ -36,6 +36,14 @@ function deploy(options) {
     delete deploySync[user+repo+branch];
     return;
   }
+
+  var restricted = env.get(user+'/'+repo+':restricted');
+  if (restricted && restricted.indexOf(branch) !== -1) {
+    console.log(user+'/'+repo+' push to restricted branch: '+branch);
+    res.send(user+'/'+repo+' push to restricted branch: '+branch);
+    delete deploySync[user+repo+branch];
+    return;
+  }
   
   console.log('Deploying '+user+'/'+repo+'#'+branch);
   res.send('Deploying '+user+'/'+repo+'#'+branch);
