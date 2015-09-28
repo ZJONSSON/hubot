@@ -26,6 +26,4 @@ tar xzf /tmp/app.tar.gz -C /home/ubuntu/builds/$appFilename
 rm -f /tmp/app.tar.gz
 
 bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $appUrl >> /tmp/app-deploy.log
-
-grep $sha $BASEDIR/.rev && echo SHA OK
 '"
