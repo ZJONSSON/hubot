@@ -50,7 +50,7 @@ function deploy(options) {
   .then(function(builds) {
     var build = builds.filter(function(d) {
       return d.branch === branch && d.outcome === 'success';
-    }).pop();
+    }).shift();
 
     if (!build) throw 'Failed to find successful build';
 
@@ -82,7 +82,7 @@ function deploy(options) {
       var component = nameParts[0];
       var buildEnv = nameParts[1];
       return {
-        'url': artifact.url + '?circle-token=' + ciToken,
+        'url': artifact.url + '?circle-token=' + env.get(user+'/'+repo+':ciToken'),
         'build': buildNumber,
         'sha': sha,
         'component': component,
