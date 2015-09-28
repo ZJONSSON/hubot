@@ -107,7 +107,7 @@ function deploy(options) {
   .then(function(artifact) {
     return execAsync([
       './bin/deploy.sh',
-      (branch&&branch+'.')+env.get(user+'/'+repo+':server'),
+      (branch&&branch+'-')+env.get(user+'/'+repo+':server'),
       artifact.build,
       artifact.url,
       artifact.sha,
@@ -115,9 +115,9 @@ function deploy(options) {
   })
   .then(function(output) {
     res.send(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
-      (branch&&branch+'.')+env.get(user+'/'+repo+':server'));
+      (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
     console.log(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
-      (branch&&branch+'.')+env.get(user+'/'+repo+':server'));
+      (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
     delete deploySync[user+repo+branch];
   })
   .catch(function(err) {
