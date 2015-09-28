@@ -5,7 +5,6 @@ server=$1
 buildNumber=$2
 appDataUrl=$3
 sha=$4
-appUrl=$5
 
 BASEDIR=/var/ubuntu/apps
 

@@ -94,13 +94,15 @@ function deploy(options) {
   .then(function(artifacts) {
     var artifact = artifacts.pop();
     if (!artifact) throw 'Could not find necessary artifacts';
+    return artifact;
+  })
+  .then(function(artifact) {
     return execAsync([
       './bin/deploy.sh',
-      env.get(user+'/'+repo+':server'),
+      (branch&&branch+'.')+env.get(user+'/'+repo+':server'),
       artifact.build,
       artifact.url,
       artifact.sha,
-      (branch&&branch+'.')+env.get(user+'/'+repo+':server')
     ].join(' '));
   })
   .then(function(output) {
