@@ -73,7 +73,7 @@ function deploy(options) {
     var sha = build.vcs_revision;
     var buildNumber = build.build_num;
 
-    var uploadable = artifacts.filter(function(artifact) {
+    return artifacts.filter(function(artifact) {
       // TODO: filter out just the build artifacts
       return true;
     }).map(function(artifact) {
@@ -89,12 +89,10 @@ function deploy(options) {
         'env': buildEnv
       };
     });
-    return uploadable;
   })
   .then(function(artifacts) {
-    console.log(artifacts)
-    if (!artifact) throw 'Could not find necessary artifacts';
     var artifact = artifacts.pop();
+    if (!artifact) throw 'Could not find necessary artifacts';
     return execAsync([
       './bin/deploy.sh',
       env.get(user+'/'+repo+':server'),
