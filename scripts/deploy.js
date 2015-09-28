@@ -22,18 +22,19 @@ module.exports = function(hubot) {
 };
 
 function deploy(options) {
+  var res = options.res;
   var user = options.user;
   var repo = options.repo;
   var branch = options.branch;
-  var res = options.res;
+  var key = user+'/'+repo+'#'+branch;
 
-  if (deploySync[user+repo+branch]) return;
-  deploySync[user+repo+branch] = true;
+  if (deploySync[key]) return;
+  deploySync[key] = true;
 
   if (!env.get(user+'/'+repo)) {
     console.log(user+'/'+repo+' not found in config');
     res.send(user+'/'+repo+' not found in config');
-    delete deploySync[user+repo+branch];
+    delete deploySync[key];
     return;
   }
 
@@ -44,9 +45,10 @@ function deploy(options) {
     delete deploySync[user+repo+branch];
     return;
   }
-  
-  console.log('Deploying '+user+'/'+repo+'#'+branch);
-  res.send('Deploying '+user+'/'+repo+'#'+branch);
+  console.log('Deploying '+key);
+  res.send('Deploying '+);
+
+  var destination = (branch&&branch+'-')+env.get(user+'/'+repo+':server');
 
   var ci = new CircleCI({
     'auth': env.get(user+'/'+repo+':ciToken')
@@ -107,23 +109,21 @@ function deploy(options) {
   .then(function(artifact) {
     return execAsync([
       './bin/deploy.sh',
-      (branch&&branch+'-')+env.get(user+'/'+repo+':server'),
+      destination,
       artifact.build,
       artifact.url,
       artifact.sha,
     ].join(' '));
   })
   .then(function(output) {
-    res.send(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
-      (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
-    console.log(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
-      (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
-    delete deploySync[user+repo+branch];
+    res.send('Deployed: '+destination);
+    console.log('Deployed: '+destination);
+    delete deploySync[key];
   })
   .catch(function(err) {
     console.error('Deployment failed');
     console.log(err);
     res.send('Deployment failed: ' + err);
-    delete deploySync[user+repo+branch];
+    delete deploySync[key];
   });
 }
