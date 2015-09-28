@@ -107,9 +107,8 @@ function deploy(options) {
     console.log(output);
     res.send(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
       (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
-    if (output.join('').indexOf('SHA OK') === -1) {
-      res.send(user+ + '/' + branch + ' failed verification');
-    }
+    console.log(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
+      (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
     delete deploySync[user+repo+branch];
   })
   .catch(function(err) {
