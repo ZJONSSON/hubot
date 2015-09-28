@@ -10,6 +10,8 @@
 
 `heroku config:set HUBOT_SLACK_TOKEN=`
 
-`heroku addons:add redistogo:nano --confirm APPNAME`
+`heroku config:set HUBOT_SSH_KEY="$(echo id_rsa)"`
+
+`heroku addons:add redistogo:nano`
 
 Deployed to heroku. Eventually pushes to master will auto-deploy lol.
