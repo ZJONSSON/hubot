@@ -64,7 +64,9 @@ function deploy(options) {
     'project': repo
   })
   .then(function(builds) {
-    var build = builds.filter(function(d) {
+    if (builds.message === 'Project not found') throw 'ciToken invalid';
+
+    var build = builds.filter && builds.filter(function(d) {
       return d.branch === branch && d.outcome === 'success';
     }).shift();
 
