@@ -1,7 +1,7 @@
 #!/bin/bash
 
 user=ubuntu
-server=$1
+host=$1
 buildNumber=$2
 appDataUrl=$3
 sha=$4
@@ -14,7 +14,7 @@ echo "$HUBOT_SSH_KEY" > /tmp/id_rsa
 
 echo "Deploying build $buildNumber"
 
-ssh $user@$server -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
+ssh $user@$host -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
 export UNPACKED=1
 
 curl -s $appDataUrl -o /tmp/app.tar.gz
@@ -24,5 +24,5 @@ echo Unpacking app
 tar xzf /tmp/app.tar.gz -C /home/ubuntu/builds/$appFilename
 rm -f /tmp/app.tar.gz
 
-bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $appFilename $appUrl production >> /home/ubuntu/app-deploy.log
+bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $host production >> /home/ubuntu/app-deploy.log
 '"
