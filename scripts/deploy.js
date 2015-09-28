@@ -9,7 +9,8 @@ module.exports = function(hubot) {
     var user = req.body.payload.username;
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
-    deploy({ user:user, repo:repo, branch:branch, res:res });
+    res.send('OK');
+    deploy({ user:user, repo:repo, branch:branch, res:{send:function(){}} });
   });
 
   hubot.respond(/deploy ([a-zA-Z]+)\/([a-zA-Z]+)(?:#*)([a-zA-Z]*)/i, function(message) {
