@@ -11,14 +11,21 @@ module.exports = function(hubot) {
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
     res.send('OK');
-    deploy({ user:user, repo:repo, branch:branch, res:{send:function(){}} });
+    deploy({ user:user, repo:repo, branch:branch, res:{ send:function(msg) {
+      console.log(msg);
+      hubot.messageRoom(room, msg);
+    }}});
   });
 
   hubot.respond(/deploy ([a-zA-Z]+)\/([a-zA-Z]+)(?:#*)([a-zA-Z]*)/i, function(message) {
     var user = message.match[1];
     var repo = message.match[2];
     var branch = message.match[3];
-    deploy({ user:user, repo:repo, branch:branch, res:message });
+    deploy({ user:user, repo:repo, branch:branch, res:{ send: function(msg) {
+      message.send(msg);
+      console.log(msg);
+      hubot.messageRoom(room, msg);
+    }}});
   });
 };
 
@@ -33,22 +40,17 @@ function deploy(options) {
   deploySync[key] = true;
 
   if (!env.get(user+'/'+repo)) {
-    console.log(user+'/'+repo+' not found in config');
     res.send(user+'/'+repo+' not found in config');
-    hubot.messageRoom(room, user+'/'+repo+' not found in config');
     delete deploySync[key];
     return;
   }
 
   var restricted = env.get(user+'/'+repo+':restricted');
   if (restricted && restricted.indexOf(branch) !== -1) {
-    console.log(user+'/'+repo+' push to restricted branch: '+branch);
     res.send(user+'/'+repo+' push to restricted branch: '+branch);
-    hubot.messageRoom(room, user+'/'+repo+' push to restricted branch: '+branch);
     delete deploySync[user+repo+branch];
     return;
   }
-  console.log('Deploying '+key);
   res.send('Deploying '+ key);
 
   var destination = (branch&&branch+'-')+env.get(user+'/'+repo+':server');
@@ -120,15 +122,10 @@ function deploy(options) {
   })
   .then(function(output) {
     res.send('Deployed: '+destination);
-    console.log('Deployed: '+destination);
-    hubot.messageRoom(room, 'Deployed: '+destination);
     delete deploySync[key];
   })
   .catch(function(err) {
-    console.error('Deployment failed');
-    console.log(err);
     res.send('Deployment failed: '+err);
-    hubot.messageRoom(room, 'Deployment failed: '+err);
     delete deploySync[key];
   });
 }
