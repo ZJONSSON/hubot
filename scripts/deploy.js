@@ -100,15 +100,15 @@ function deploy(options) {
       artifact.build,
       artifact.url,
       artifact.sha,
-      (branch&&branch+'-')+env.get(user+'/'+repo+':server')
+      (branch&&branch+'.')+env.get(user+'/'+repo+':server')
     ].join(' '));
   })
   .then(function(output) {
     console.log(output);
     res.send(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
-      (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
+      (branch&&branch+'.')+env.get(user+'/'+repo+':server'));
     console.log(user+'/'+repo+(branch&&'#'+branch)+' deployed: ' +
-      (branch&&branch+'-')+env.get(user+'/'+repo+':server'));
+      (branch&&branch+'.')+env.get(user+'/'+repo+':server'));
     delete deploySync[user+repo+branch];
   })
   .catch(function(err) {
