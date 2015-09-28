@@ -46,7 +46,7 @@ function deploy(options) {
     return;
   }
   console.log('Deploying '+key);
-  res.send('Deploying '+);
+  res.send('Deploying '+ key);
 
   var destination = (branch&&branch+'-')+env.get(user+'/'+repo+':server');
 
