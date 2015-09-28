@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 var execAsync = Promise.promisify(require('child_process').exec);
 var env = require('nconf').argv().env().file('default', 'config.json');
 var deploySync = {};
+var room = 'engineering-git';
 
 module.exports = function(hubot) {
   hubot.router.post('/hubot/deploy', function(req, res) {
@@ -34,6 +35,7 @@ function deploy(options) {
   if (!env.get(user+'/'+repo)) {
     console.log(user+'/'+repo+' not found in config');
     res.send(user+'/'+repo+' not found in config');
+    hubot.messageRoom(room, user+'/'+repo+' not found in config');
     delete deploySync[key];
     return;
   }
@@ -42,6 +44,7 @@ function deploy(options) {
   if (restricted && restricted.indexOf(branch) !== -1) {
     console.log(user+'/'+repo+' push to restricted branch: '+branch);
     res.send(user+'/'+repo+' push to restricted branch: '+branch);
+    hubot.messageRoom(room, user+'/'+repo+' push to restricted branch: '+branch);
     delete deploySync[user+repo+branch];
     return;
   }
@@ -118,12 +121,14 @@ function deploy(options) {
   .then(function(output) {
     res.send('Deployed: '+destination);
     console.log('Deployed: '+destination);
+    hubot.messageRoom(room, 'Deployed: '+destination);
     delete deploySync[key];
   })
   .catch(function(err) {
     console.error('Deployment failed');
     console.log(err);
-    res.send('Deployment failed: ' + err);
+    res.send('Deployment failed: '+err);
+    hubot.messageRoom(room, 'Deployment failed: '+err);
     delete deploySync[key];
   });
 }
