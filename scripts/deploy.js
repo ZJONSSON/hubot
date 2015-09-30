@@ -10,8 +10,9 @@ module.exports = function(hubot) {
     var user = req.body.payload.username;
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
+    var prod = req.body.prod;
     res.send('OK');
-    deploy({ user:user, repo:repo, branch:branch, res:{ send:function(msg) {
+    deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send:function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
     }}});
@@ -34,6 +35,7 @@ function deploy(options) {
   var user = options.user;
   var repo = options.repo;
   var branch = options.branch;
+  var prod = options.prod;
   var key = user+'/'+repo+'#'+branch;
 
   if (deploySync[key]) return;
@@ -51,9 +53,13 @@ function deploy(options) {
     delete deploySync[user+repo+branch];
     return;
   }
-  res.send('Deploying '+ key);
+  res.send('Deploying '+key+(prod ? ' to PRODUCTION' : ''));
 
-  var destination = (branch&&branch+'-')+env.get(user+'/'+repo+':server');
+  var destination = (branch&&branch+'-')+env.get(user+'/'+repo+':server:dev');
+  if (branch === 'master' && prod)
+    destination = 'prod-'+env.get(user+'/'+repo+':server:prod');
+  else if (branch === 'master')
+    destination = 'stg-'+env.get(user+'/'+repo+':server:prod');
 
   var ci = new CircleCI({
     'auth': env.get(user+'/'+repo+':ciToken')
