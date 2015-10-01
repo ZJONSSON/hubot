@@ -1,3 +1,21 @@
+/*
+  Description:
+    Hubot deploy script
+
+  Configuration:
+    HUBOT_SSH_KEY - `heroku config:set HUBOT_SSH_KEY="$(echo id_rsa)"`
+    config.json - {
+      "username/reponame": {
+        "servers": { "dev": '', "prod": '' }
+      },
+      etc..
+    }
+
+  Commands:
+    hubot deploy user/repo#branch
+    post(/hubot/deploy, { payload: { username: '', reponame: '', branch: '' }, prod: boolean })
+*/
+
 var CircleCI = require('circleci');
 var Promise = require('bluebird');
 var execAsync = Promise.promisify(require('child_process').exec);
