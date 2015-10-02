@@ -7,13 +7,19 @@ buildNumber=$3
 appDataUrl=$4
 sha=$5
 
-BASEDIR=/var/ubuntu/apps
-
 appFilename=app-$buildNumber
+BASEDIR=/var/ubuntu/apps
 
 echo "$HUBOT_SSH_KEY" > /tmp/id_rsa
 
 echo "Deploying build $buildNumber"
+echo "user=$user"
+echo "server=$server"
+echo "host=$host"
+echo "appDataUrl=$appDataUrl"
+echo "sha=$sha"
+echo "appFilename=$appFilename"
+
 
 ssh $user@$server -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
 export UNPACKED=1
