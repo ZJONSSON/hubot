@@ -1,10 +1,11 @@
 #!/bin/bash
 
 user=ubuntu
-host=$1
-buildNumber=$2
-appDataUrl=$3
-sha=$4
+server=$1
+host=$2
+buildNumber=$3
+appDataUrl=$4
+sha=$5
 
 BASEDIR=/var/ubuntu/apps
 
@@ -14,7 +15,7 @@ echo "$HUBOT_SSH_KEY" > /tmp/id_rsa
 
 echo "Deploying build $buildNumber"
 
-ssh $user@$host -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
+ssh $user@$server -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
 export UNPACKED=1
 
 curl -s $appDataUrl -o /tmp/app.tar.gz

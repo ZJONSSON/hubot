@@ -6,7 +6,7 @@
     HUBOT_SSH_KEY - `heroku config:set HUBOT_SSH_KEY="$(echo id_rsa)"`
     config.json - {
       "username/reponame": {
-        "servers": { "dev": '', "prod": '' }
+        "servers": { "dev": '', "prod(optional)": '' , "server(optional)": ''}
       },
       etc..
     }
@@ -29,8 +29,9 @@ module.exports = function(hubot) {
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
     var prod = req.body.prod;
+    var server = req.body.server;
     res.send('OK');
-    deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send:function(msg) {
+    deploy({ user:user, repo:repo, branch:branch, prod:prod, server:server, res:{ send:function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
     }}});
@@ -54,6 +55,7 @@ function deploy(options) {
   var repo = options.repo;
   var branch = options.branch;
   var prod = options.prod;
+  var server = options.server;
   var key = user+'/'+repo+'#'+branch;
 
   if (deploySync[key]) return;
@@ -75,7 +77,7 @@ function deploy(options) {
 
   var destination = (branch&&branch+'-')+env.get(user+'/'+repo+':server:dev');
   if (branch === 'master' && prod)
-    destination = 'prod-'+env.get(user+'/'+repo+':server:prod');
+    destination = env.get(user+'/'+repo+':server:prod');
   else if (branch === 'master')
     destination = 'stg-'+env.get(user+'/'+repo+':server:prod');
 
@@ -140,6 +142,7 @@ function deploy(options) {
   .then(function(artifact) {
     return execAsync([
       './bin/deploy.sh',
+      server || destination,
       destination,
       artifact.build,
       artifact.url,
