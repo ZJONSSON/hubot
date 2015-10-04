@@ -3,6 +3,7 @@
     Hubot deploy script
 
   Configuration:
+    HUBOT_GITHUB_TOKEN
     HUBOT_SSH_KEY - `heroku config:set HUBOT_SSH_KEY="$(echo id_rsa)"`
     config.json - {
       "username/reponame": {
@@ -16,25 +17,36 @@
     post(/hubot/deploy, { payload: { username: '', reponame: '', branch: '' }, prod: boolean })
 */
 
+var env = require('nconf').argv().env().file('default', 'config.json');
+var room = 'engineering-git';
+
 var CircleCI = require('circleci');
 var Promise = require('bluebird');
 var execAsync = Promise.promisify(require('child_process').exec);
-var env = require('nconf').argv().env().file('default', 'config.json');
 var deploySync = {};
-var room = 'engineering-git';
+var takedownSync = {};
 
 module.exports = function(hubot) {
+  hubot.router.post('/hubot/takedown', function(req, res) {
+    var repo = req.body.repository && req.body.repository.full_name;
+    var branch = req.body.ref && req.body.ref.replace(/refs\/heads\//,'');
+    takedown({ repo:repo, branch:branch, res:{ send:function(msg) {
+      console.log(msg);
+      hubot.messageRoom(room, msg);
+    }}});
+    res.send('OK');
+  });
   hubot.router.post('/hubot/deploy', function(req, res) {
     var user = req.body.payload.username;
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
     var prod = req.body.prod;
     var server = req.body.server;
-    res.send('OK');
     deploy({ user:user, repo:repo, branch:branch, prod:prod, server:server, res:{ send:function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
     }}});
+    res.send('OK');
   });
 
   hubot.respond(/deploy ([a-zA-Z]+)\/([a-zA-Z]+)(?:#*)([a-zA-Z]*)/i, function(message) {
@@ -156,5 +168,33 @@ function deploy(options) {
   .catch(function(err) {
     res.send('Deployment failed: '+err);
     delete deploySync[key];
+  });
+}
+
+function takedown(options) {
+  var res = options.res;
+  var repo = options.repo;
+  var branch = options.branch;
+  var key = repo + '#' + branch;
+  if (takedownSync[key]) return;
+  takedownSync[key] = true;
+
+  if (!env.get(repo)) {
+    res.send(repo+' not found in config');
+    delete takedownSync[key];
+    return;
+  }
+
+  var destination = branch+'-'+env.get(repo+':server:dev');
+
+  execAsync([
+    './bin/takedown.sh',
+    destination
+  ].join(' ')).then(function(output) {
+    res.send('Took down ' + key); 
+    delete takedownSync[key];
+  }).catch(function(err) {
+    res.send('Error taking down ' + key + ' : ' + err); 
+    delete takedownSync[key];
   });
 }
