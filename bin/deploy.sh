@@ -31,5 +31,7 @@ echo Unpacking app
 tar xzf /tmp/app.tar.gz -C /home/ubuntu/builds/$appFilename
 rm -f /tmp/app.tar.gz
 
+echo "\"$sha\"" > /home/ubuntu/builds/$appFilename/rev.json
+
 bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $host production >> /home/ubuntu/app-deploy.log
 '"
