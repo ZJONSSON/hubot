@@ -92,6 +92,8 @@ function deploy(options) {
   else if (branch === 'master')
     destination = 'stg-'+env.get(user+'/'+repo+':server:prod');
 
+  var NODE_ENV = (branch === 'master') ? 'production' : 'development';
+
   var ci = new CircleCI({
     'auth': env.get(user+'/'+repo+':ciToken')
   });
@@ -158,6 +160,7 @@ function deploy(options) {
       artifact.build,
       artifact.url,
       artifact.sha,
+      NODE_ENV
     ].join(' '));
   })
   .then(function(output) {
