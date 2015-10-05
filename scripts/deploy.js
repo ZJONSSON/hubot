@@ -3,7 +3,6 @@
     Hubot deploy script
 
   Configuration:
-    HUBOT_GITHUB_TOKEN
     HUBOT_SSH_KEY - `heroku config:set HUBOT_SSH_KEY="$(echo id_rsa)"`
     config.json - {
       "username/reponame": {
