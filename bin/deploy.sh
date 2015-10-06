@@ -25,7 +25,7 @@ echo "appFilename=$appFilename"
 ssh $user@$server -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
 export UNPACKED=1
 
-curl -s $appDataUrl -o /tmp/app.tar.gz
+wget -c -t 10 --timeout=60 --waitretry=5 $appDataUrl -O /tmp/app.tar.gz
 mkdir -p /home/ubuntu/builds/$appFilename
 
 echo Unpacking app
