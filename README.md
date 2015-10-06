@@ -10,7 +10,7 @@
 
 `heroku config:set HUBOT_SLACK_TOKEN=`
 
-`heroku config:set HUBOT_SSH_KEY="$(echo id_rsa)"`
+`heroku config:set HUBOT_SSH_KEY="$(cat id_rsa)"`
 
 `heroku addons:add redistogo:nano`
 
