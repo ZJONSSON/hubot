@@ -48,7 +48,7 @@ module.exports = function(hubot) {
     res.send('OK');
   });
 
-  hubot.respond(/deploy ([a-zA-Z]+)\/([a-zA-Z]+)(?:#*)([a-zA-Z]*)/i, function(message) {
+  hubot.respond(/deploy ([\S^\/]+)\/([\S^#]+)(?:#*)([\S]*)/i, function(message) {
     var user = message.match[1];
     var repo = message.match[2];
     var branch = message.match[3];
