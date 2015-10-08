@@ -85,12 +85,14 @@ function deploy(options) {
     return;
   }
   res.send('Deploying '+key+(prod ? ' to PRODUCTION' : ''));
-
-  var destination = (branch&&branch+'-')+env.get(user+'/'+repo+':server:dev');
+  
+  var destination;
   if (branch === 'master' && prod)
     destination = env.get(user+'/'+repo+':server:prod');
   else if (branch === 'master')
     destination = 'stg-'+env.get(user+'/'+repo+':server:prod');
+  else
+    destination = branch.replace(/([^\w\d\s-])/,'')+'-'+env.get(user+'/'+repo+':server:dev');
 
   var NODE_ENV = (branch === 'master') ? 'production' : 'development';
 
