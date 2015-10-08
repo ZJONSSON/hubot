@@ -39,20 +39,19 @@ module.exports = function(hubot) {
     var user = req.body.payload.username;
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
-    var prod = req.body.prod;
     var server = req.body.server;
-    deploy({ user:user, repo:repo, branch:branch, prod:prod, server:server, res:{ send:function(msg) {
+    deploy({ user:user, repo:repo, branch:branch, server:server, res:{ send:function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
     }}});
     res.send('OK');
   });
-
-  hubot.respond(/deploy ([\S^\/]+)\/([\S^#]+)(?:#*)([\S]*)/i, function(message) {
+  hubot.respond(/deploy ([\S^\/]+)\/([\S^#]+)(?:#*)([\S]*)([\S\s]+)/i, function(message) {
     var user = message.match[1];
     var repo = message.match[2];
     var branch = message.match[3];
-    deploy({ user:user, repo:repo, branch:branch, res:{ send: function(msg) {
+    var prod = message.match[4] && message.match[4].indexOf('to prod') > -1;
+    deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send: function(msg) {
       message.send(msg);
       console.log(msg);
       hubot.messageRoom(room, msg);
@@ -64,7 +63,7 @@ function deploy(options) {
   var res = options.res;
   var user = options.user;
   var repo = options.repo;
-  var branch = options.branch;
+  var branch = options.branch || 'master';
   var prod = options.prod;
   var server = options.server;
   var key = user+'/'+repo+'#'+branch;
