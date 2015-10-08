@@ -12,7 +12,6 @@
 
 var room = 'engineering-git';
 var interval = 60000;
-var Promise = require('bluebird');
 var request = require('request');
 
 module.exports = function(hubot) {
