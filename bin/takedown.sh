@@ -9,7 +9,7 @@ echo "$HUBOT_SSH_KEY" > /tmp/id_rsa
 
 ssh $user@$server -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
   CONTAINER=\`docker ps -q --filter label=name=$server\`
-  if [ -n "$CONTAINER" ]
+  if [ -n \"$CONTAINER\" ]
   then docker stop $CONTAINER
   fi
 '"
