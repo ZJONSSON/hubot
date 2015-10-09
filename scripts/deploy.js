@@ -42,6 +42,7 @@ module.exports = function(hubot) {
     takedown({ repo:user+'/'+repo, branch:branch, res:{ send:function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
+      if (message.envelope.room !== room) message.send(msg);
     }}});
   });
 
@@ -64,6 +65,7 @@ module.exports = function(hubot) {
     deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send: function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
+      if (message.envelope.room !== room) message.send(msg);
     }}});
   });
 };
