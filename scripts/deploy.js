@@ -52,7 +52,6 @@ module.exports = function(hubot) {
     var branch = message.match[3];
     var prod = message.match[4] && message.match[4].indexOf('to prod') > -1;
     deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send: function(msg) {
-      message.send(msg);
       console.log(msg);
       hubot.messageRoom(room, msg);
     }}});
