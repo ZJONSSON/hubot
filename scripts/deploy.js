@@ -35,6 +35,16 @@ module.exports = function(hubot) {
     }}});
     res.send('OK');
   });
+  hubot.respond(/takedown ([\S^\/]+)\/([\S^#]+)(?:#*)([\S]*)/i, function(message) {
+    var user = message.match[1];
+    var repo = message.match[2];
+    var branch = message.match[3];
+    takedown({ repo:user+'/'+repo, branch:branch, res:{ send:function(msg) {
+      console.log(msg);
+      hubot.messageRoom(room, msg);
+    }}});
+  });
+
   hubot.router.post('/hubot/deploy', function(req, res) {
     var user = req.body.payload.username;
     var repo = req.body.payload.reponame;
@@ -183,6 +193,16 @@ function takedown(options) {
 
   if (!env.get(repo)) {
     res.send(repo+' not found in config');
+    delete takedownSync[key];
+    return;
+  }
+  if (!branch) {
+    res.send('Specify a branch for ' + repo);
+    delete takedownSync[key];
+    return;
+  }
+  if (branch === 'master') {
+    res.send('What are you trying to pull?');
     delete takedownSync[key];
     return;
   }
