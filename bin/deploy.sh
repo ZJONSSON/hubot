@@ -32,5 +32,6 @@ echo Unpacking app
 tar xzf /tmp/app.tar.gz -C /home/ubuntu/builds/$appFilename
 rm -f /tmp/app.tar.gz
 
+mkdir -p /home/ubuntu/logs
 bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $host $NODE_ENV >> /home/ubuntu/logs/app-deploy-$host.log
 '"
