@@ -47,7 +47,7 @@ module.exports = function(hubot) {
       hubot.messageRoom('ping not found or removed: ' + url);
     }
   });
-  hubot.respond(/list pings)/i, function(message) {
+  hubot.respond(/list pings/i, function(message) {
     console.log(JSON.stringify(hubot.brain.get('pings') || []));
     hubot.messageRoom(JSON.stringify(pings));
   });
