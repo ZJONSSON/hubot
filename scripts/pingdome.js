@@ -19,14 +19,14 @@ module.exports = function(hubot) {
   function sendMessage(message, msg) {
     console.log(msg);
     hubot.messageRoom(room, msg);
-    if (message.envelope.room !== room) message.send(msg);
+    if (message && message.envelope.room !== room) message.send(msg);
   }
 
   function pingdome() {
     (hubot.brain.get('pings') || []).forEach(function(url) {
       request(url, function(err, res, body) {
         if ([200,403,"200","403"].indexOf(res.statusCode) < 0) {
-          sendMessage(room, url + ' is DOWN!');
+          sendMessage(null, url + ' is DOWN!');
         }
       });
     });
