@@ -209,7 +209,7 @@ function takedown(options) {
     return;
   }
 
-  var destination = branch+'-'+env.get(repo+':server:dev');
+  var destination = branch.replace(/([^\w\d\s-])/,'')+'-'+env.get(repo+':server:dev');
 
   execAsync([
     './bin/takedown.sh',
