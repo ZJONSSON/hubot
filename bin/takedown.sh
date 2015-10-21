@@ -11,3 +11,4 @@ ssh $user@$server -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
   docker stop \`docker ps -q --filter label=name=$server\` 2>/dev/null | docker rm 2>/dev/null
   docker rmi $server 2>/dev/null
 '"
+exit 0
