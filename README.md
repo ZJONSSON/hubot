@@ -1,17 +1,19 @@
 ## Hubot
 
-`cp config.json ./scripts`
+`cp config.json ./`
 
 `heroku create APPNAME`
 
-`heroku config:set HEROKU_URL=`
+`heroku git:remote -a APPNAME`
 
-`heroku config:set HUBOT_GITHUB_ORG=`
+`heroku config:set HEROKU_URL=#### -a APPNAME`
 
-`heroku config:set HUBOT_SLACK_TOKEN=`
+`heroku config:set HUBOT_GITHUB_ORG=#### -a APPNAME`
 
-`heroku config:set HUBOT_SSH_KEY="$(cat id_rsa)"`
+`heroku config:set HUBOT_SLACK_TOKEN=#### -a APPNAME`
 
-`heroku addons:add redistogo:nano`
+`heroku config:set HUBOT_SSH_KEY="$(cat id_rsa)" -a APPNAME`
+
+`heroku addons:add redistogo:nano -a APPNAME`
 
 Deployed to heroku. Eventually pushes to master will auto-deploy lol.
