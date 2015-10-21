@@ -19,15 +19,16 @@ module.exports = function(hubot) {
   function sendMessage(message, msg) {
     console.log(msg);
     hubot.messageRoom(room, msg);
-    if (message && message.envelope.room !== room) message.send(msg);
+    if (message && message.envelope && message.envelope.room !== room)
+      message.send(msg);
   }
 
   function pingdome() {
     (hubot.brain.get('pings') || []).forEach(function(url) {
       request(url, function(err, res, body) {
-        if ([200,403,"200","403"].indexOf(res.statusCode) < 0) {
-          sendMessage(null, url + ' is DOWN!');
-        }
+        if (err) sendMessage('Error contacting: ' + url + '  ' + err);
+        else if ([200,403,"200","403"].indexOf(res.statusCode) < 0)
+          sendMessage(null, url + ' is DOWN!  statusCode:' + res.statusCode);
       });
     });
   }
