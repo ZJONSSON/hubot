@@ -74,7 +74,8 @@ function deploy(options) {
   var res = options.res;
   var user = options.user;
   var repo = options.repo;
-  var branch = options.branch || 'master';
+  var releaseBranch = env.get(user+'/'+repo+':releaseBranch');
+  var branch = (options.branch || releaseBranch).replace(/([^\w\d\s-])/,'');
   var prod = options.prod;
   var server = options.server;
   var key = user+'/'+repo+'#'+branch;
@@ -88,6 +89,12 @@ function deploy(options) {
     return;
   }
 
+  if (!releaseBranch) {
+    res.send('No release branch for '+user+'/'+repo);
+    delete deploySync[key];
+    return;
+  }
+
   var restricted = env.get(user+'/'+repo+':restricted');
   if (restricted && restricted.indexOf(branch) !== -1) {
     res.send(user+'/'+repo+' push to restricted branch: '+branch);
@@ -97,14 +104,14 @@ function deploy(options) {
   res.send('Deploying '+key+(prod ? ' to PRODUCTION' : ''));
   
   var destination;
-  if (branch === 'master' && prod)
+  if (prod && branch === releaseBranch)
     destination = env.get(user+'/'+repo+':server:prod');
-  else if (branch === 'master')
+  else if (branch === releaseBranch)
     destination = 'stg-'+env.get(user+'/'+repo+':server:prod');
   else
-    destination = branch.replace(/([^\w\d\s-])/,'')+'-'+env.get(user+'/'+repo+':server:dev');
+    destination = branch+'-'+env.get(user+'/'+repo+':server:dev');
 
-  var NODE_ENV = (branch === 'master') ? 'production' : 'development';
+  var NODE_ENV = (branch === releaseBranch) ? 'production' : 'development';
 
   var ci = new CircleCI({
     'auth': env.get(user+'/'+repo+':ciToken')
@@ -181,7 +188,7 @@ function deploy(options) {
     return execAsync([
       './bin/rollbar.sh',
       env.get(user+'/'+repo+':rollbarToken'),
-      prod ? 'production' : branch,
+      branch === releaseBranch ? 'production' : branch,
       artifact.sha
     ].join(' '));
   })
