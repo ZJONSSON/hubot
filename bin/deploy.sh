@@ -34,4 +34,5 @@ rm -f /tmp/app.tar.gz
 
 mkdir -p /home/ubuntu/logs
 bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $host $NODE_ENV >> /home/ubuntu/logs/app-deploy-$host.log
+exit 0
 '"
