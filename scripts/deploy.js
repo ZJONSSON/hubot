@@ -173,9 +173,19 @@ function deploy(options) {
       artifact.url,
       artifact.sha,
       NODE_ENV
+    ].join(' ')).then(function() { return artifact; });
+  })
+  .then(function(artifact) {
+    if (!env.get(user+'/'+repo+':rollbarToken'))
+      return res.send('rollbarToken missing for '+user+'/'+repo);
+    return execAsync([
+      './bin/rollbar.sh',
+      env.get(user+'/'+repo+':rollbarToken'),
+      prod ? 'production' : branch,
+      artifact.sha
     ].join(' '));
   })
-  .then(function(output) {
+  .then(function() {
     res.send('Deployed: '+destination);
     delete deploySync[key];
   })
