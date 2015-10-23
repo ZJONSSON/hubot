@@ -98,9 +98,16 @@ function deploy(options) {
   var restricted = env.get(user+'/'+repo+':restricted');
   if (restricted && restricted.indexOf(branch) !== -1) {
     res.send(user+'/'+repo+' push to restricted branch: '+branch);
-    delete deploySync[user+repo+branch];
+    delete deploySync[key];
     return;
   }
+
+  if (prod && branch !== releaseBranch) {
+    res.send('Sorry, '+branch+' is not authorized for release to production');
+    delete deploySync[key];
+    return;
+  }
+
   res.send('Deploying '+key+(prod ? ' to PRODUCTION' : ''));
   
   var destination;
@@ -188,7 +195,7 @@ function deploy(options) {
     return execAsync([
       './bin/rollbar.sh',
       env.get(user+'/'+repo+':rollbarToken'),
-      branch === releaseBranch ? 'production' : branch,
+      branch === releaseBranch ? (prod?'production':'staging') : branch,
       artifact.sha
     ].join(' '));
   })
