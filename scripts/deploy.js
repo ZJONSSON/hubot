@@ -57,7 +57,7 @@ module.exports = function(hubot) {
     }}});
     res.send('OK');
   });
-  hubot.respond(/deploy (\S[^\/]+)\/(\S[^#\s]+)(?:#*)(\S*)([\S\s]+)/i, function(message) {
+  hubot.respond(/deploy (\S[^\/]+)\/(\S[^#\s]+)(#*\S*)([\S\s]*)/i, function(message) {
     var user = message.match[1];
     var repo = message.match[2];
     var branch = message.match[3];
