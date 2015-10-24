@@ -95,7 +95,7 @@ function deploy(options) {
     return;
   }
 
-  var restricted = env.get(user+'/'+repo+':restricted');
+  var restricted = env.get(user+'/'+repo+':restrictedBranches');
   if (restricted && restricted.indexOf(branch) !== -1) {
     res.send(user+'/'+repo+' push to restricted branch: '+branch);
     delete deploySync[key];
