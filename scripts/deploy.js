@@ -114,9 +114,9 @@ function deploy(options) {
   if (prod && branch === releaseBranch)
     destination = env.get(user+'/'+repo+':server:prod');
   else if (branch === releaseBranch)
-    destination = 'stg-'+env.get(user+'/'+repo+':server:prod');
+    destination = env.get(user+'/'+repo+':server:stg');
   else
-    destination = branch+'-'+env.get(user+'/'+repo+':server:dev');
+    destination = branch+env.get(user+'/'+repo+':server:dev');
 
   var NODE_ENV = (branch === releaseBranch) ? 'production' : 'development';
 
