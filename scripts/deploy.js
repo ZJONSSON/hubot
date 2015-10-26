@@ -51,7 +51,8 @@ module.exports = function(hubot) {
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
     var server = req.body.server;
-    deploy({ user:user, repo:repo, branch:branch, server:server, res:{ send:function(msg) {
+    var prod = req.body.prod;
+    deploy({ user:user, repo:repo, branch:branch, server:server, prod:prod, res:{ send:function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
     }}});
