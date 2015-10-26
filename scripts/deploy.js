@@ -109,7 +109,7 @@ function deploy(options) {
     return;
   }
 
-  res.send('Deploying '+key+(prod?' to PRODUCTION':'')(server?' via '+server:''));
+  res.send('Deploying '+key+(prod?' to PRODUCTION':'')+(server?' via '+server:''));
   
   var destination;
   if (prod && branch === releaseBranch)
