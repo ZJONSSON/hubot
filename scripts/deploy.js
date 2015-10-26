@@ -112,8 +112,12 @@ function deploy(options) {
   res.send('Deploying '+key+(prod?' to PRODUCTION':'')+(server?' via '+server:''));
   
   var destination;
-  if (prod && branch === releaseBranch)
+  if (prod && branch === releaseBranch) {
     destination = env.get(user+'/'+repo+':server:prod');
+    server = server || destination;
+    if (env.get(user+'/'+repo+':server:prod2'))
+      destination += ',' + env.get(user+'/'+repo+':server:prod2');
+  }
   else if (branch === releaseBranch)
     destination = env.get(user+'/'+repo+':server:stg');
   else
