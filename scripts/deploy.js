@@ -52,10 +52,16 @@ module.exports = function(hubot) {
     var branch = req.body.payload.branch;
     var server = req.body.server;
     var prod = req.body.prod;
-    deploy({ user:user, repo:repo, branch:branch, server:server, prod:prod, res:{ send:function(msg) {
+    if (req.body.payload.failed) {
+      var msg = 'Build failed for '+user+'/'+repo+'#'+branch+' '+req.body.payload.build_url;
       console.log(msg);
       hubot.messageRoom(room, msg);
-    }}});
+    } else {
+      deploy({ user:user, repo:repo, branch:branch, server:server, prod:prod, res:{ send:function(msg) {
+        console.log(msg);
+        hubot.messageRoom(room, msg);
+      }}});
+    }
     res.send('OK');
   });
   hubot.respond(/deploy (\S[^\/]+)\/(\S[^#\s]+)(#*\S*)([\S\s]*)/i, function(message) {
