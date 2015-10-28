@@ -223,7 +223,7 @@ function deploy(options) {
 function takedown(options) {
   var res = options.res;
   var repo = options.repo;
-  var branch = options.branch;
+  var branch = options.branch.replace(/([^\w\d\s-])/,'');
   var key = repo + '#' + branch;
   if (takedownSync[key]) return;
   takedownSync[key] = true;
@@ -244,7 +244,7 @@ function takedown(options) {
     return;
   }
 
-  var destination = branch.replace(/([^\w\d\s-])/,'')+'-'+env.get(repo+':server:dev');
+  var destination = branch+env.get(repo+':server:dev');
 
   execAsync([
     './bin/takedown.sh',
