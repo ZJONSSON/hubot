@@ -6,14 +6,21 @@
     HUBOT_SSH_KEY - `heroku config:set HUBOT_SSH_KEY="$(echo id_rsa)"`
     config.json - {
       "username/reponame": {
-        "servers": { "dev": '', "prod(optional)": '' , "server(optional)": ''}
-      },
-      etc..
+        "releaseBranch": "master",
+        "restrictedBranches": [ "stg" ],
+        "server": {
+          "dev": "-dev.myhost.com",
+          "prod": "myhost.com"
+        },
+        "ciToken": "",
+        "rollbarToken": ""
+      }
     }
 
   Commands:
     hubot deploy user/repo#branch
-    post(/hubot/deploy, { payload: { username: '', reponame: '', branch: '' }, prod: boolean })
+    hubot deploy user/repo to prod
+    post(/hubot/deploy, { payload: { username: '', reponame: '', branch: '' }, prod: Boolean, server: String })
 */
 
 var env = require('nconf').argv().env().file('default', 'config.json');
