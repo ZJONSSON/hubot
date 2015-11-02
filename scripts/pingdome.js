@@ -24,9 +24,9 @@ module.exports = function(hubot) {
   }
 
   function pingdome() {
-    (hubot.brain.get('pings') || []).forEach(function(url) {
+    [].concat(hubot.brain.get('pings')).forEach(function(url) {
       request(url, function(err, res, body) {
-        if (err) sendMessage('Error contacting: ' + url + '  ' + err);
+        if (err) sendMessage(null, 'Error contacting: ' + url + '  ' + err);
         else if ([200,403,"200","403"].indexOf(res.statusCode) < 0)
           sendMessage(null, url + ' is DOWN!  statusCode:' + res.statusCode);
       });
@@ -37,7 +37,7 @@ module.exports = function(hubot) {
 
   hubot.respond(/add ping (\S+)/i, function(message) {
     var url = message.match[1];
-    var pings = hubot.brain.get('pings') || [];
+    var pings = [].concat(hubot.brain.get('pings'));
     if (pings.filter(function(d) { return d === url; }).length) {
       sendMessage(message, 'ping already added: ' + url);
     } else {
@@ -49,7 +49,7 @@ module.exports = function(hubot) {
   });
   hubot.respond(/remove ping (\S+)/i, function(message) {
     var url = message.match[1];
-    var pings = hubot.brain.get('pings') || [];
+    var pings = [].concat(hubot.brain.get('pings'));
     var len = pings.length;
     pings = pings.filter(function(d) { return d !== url; }); 
     if (pings.length < len) {
@@ -61,7 +61,7 @@ module.exports = function(hubot) {
     }
   });
   hubot.respond(/list pings/i, function(message) {
-    sendMessage(message, (hubot.brain.get('pings') || []).join(' '));
+    sendMessage(message, [].concat(hubot.brain.get('pings')).join(' '));
   });
 
 };
