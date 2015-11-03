@@ -27,7 +27,7 @@ module.exports = function(hubot) {
     [].concat(hubot.brain.get('pings')).forEach(function(url) {
       request(url, function(err, res, body) {
         if (err) sendMessage(null, 'Error contacting: ' + url + '  ' + err);
-        else if ([200,403,"200","403"].indexOf(res.statusCode) < 0)
+        else if ([200,400,403,"200","400","403"].indexOf(res.statusCode) < 0)
           sendMessage(null, url + ' is DOWN!  statusCode:' + res.statusCode);
       });
     });
