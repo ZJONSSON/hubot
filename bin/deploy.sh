@@ -7,6 +7,7 @@ buildNumber=$3
 appDataUrl=$4
 sha=$5
 NODE_ENV=$6
+cores=$7
 
 appFilename=app-$buildNumber
 BASEDIR=/var/ubuntu/apps
@@ -34,6 +35,6 @@ rm -f /tmp/app.tar.gz
 
 mkdir -p /home/ubuntu/logs
 rm /home/ubuntu/logs/app-deploy-$host.log
-bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $host $NODE_ENV >> /home/ubuntu/logs/app-deploy-$host.log
+bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $host $NODE_ENV $cores >> /home/ubuntu/logs/app-deploy-$host.log
 exit 0
 '"
