@@ -134,6 +134,8 @@ function deploy(options) {
   }
   else if (branch === releaseBranch)
     destination = env.get(user+'/'+repo+':server:stg');
+  else if (env.get(user+'/'+repo+':server:'+branch))
+    destination = env.get(user+'/'+repo+':server:'+branch);
   else
     destination = branch+env.get(user+'/'+repo+':server:dev');
 
