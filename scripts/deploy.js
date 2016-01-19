@@ -52,6 +52,21 @@ module.exports = function(hubot) {
       if (message.envelope.room !== room) message.send(msg);
     }}});
   });
+  hubot.respond(/build (\S[^\/]+)\/(\S[^#\s]+)(?:#*)(\S*)/i, function(message) {
+    var user = message.match[1];
+    var repo = message.match[2];
+    var branch = message.match[3];
+    Promise.resolve().then(function() {
+      return (new CircleCI({'auth': env.get(user+'/'+repo+':ciToken') }))
+        .startBuild({ username: user, project: repo, branch: branch });
+    }).then(function(build) {
+      console.log('Building: ' + build.build_url);
+      hubot.messageRoom(room, 'Building: ' + build.build_url);
+    }).catch(function(err) {
+      console.log(err);
+      hubot.messageRoom(room, err);
+    });
+  });
 
   hubot.router.post('/hubot/deploy', function(req, res) {
     var user = req.body.payload.username;
