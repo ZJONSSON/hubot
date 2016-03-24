@@ -76,8 +76,19 @@ module.exports = function(hubot) {
     var prod = req.body.prod;
     if (req.body.payload.failed) {
       var msg = 'Build failed for '+user+'/'+repo+'#'+branch+' '+req.body.payload.build_url;
-      console.log(msg);
-      hubot.messageRoom(room, msg);
+      if (req.body.payload.why === 'retry') {
+        console.log(msg);
+        hubot.messageRoom(room, msg);
+      } else {
+        var ci = new CircleCI({'auth': env.get(user+'/'+repo+':ciToken') });
+        ci.clearBuildCache({ username: user, project: repo }).then(function() {
+          return ci.retryBuild({ username: user, project: repo, build_num: req.body.payload.build_num });
+        }).then(function(build) {
+          msg += '\nRetrying without cache ' + build.build_url;
+          console.log(msg);
+          hubot.messageRoom(room, msg);
+        });
+      }
     } else {
       deploy({ user:user, repo:repo, branch:branch, server:server, prod:prod, res:{ send:function(msg) {
         console.log(msg);
