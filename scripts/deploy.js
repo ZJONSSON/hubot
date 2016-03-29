@@ -52,20 +52,23 @@ module.exports = function(hubot) {
       if (message.envelope.room !== room) message.send(msg);
     }}});
   });
-  hubot.respond(/build (\S[^\/]+)\/(\S[^#\s]+)(?:#*)(\S*)/i, function(message) {
+  hubot.respond(/build (\S[^\/]+)\/(\S[^#\s]+)(#*\S*)([\S\s]*)/i, function(message) {
     var user = message.match[1];
     var repo = message.match[2];
-    var branch = message.match[3];
-    Promise.resolve().then(function() {
-      return (new CircleCI({'auth': env.get(user+'/'+repo+':ciToken') }))
-        .startBuild({ username: user, project: repo, branch: branch });
-    }).then(function(build) {
-      console.log('Building: ' + build.build_url);
-      hubot.messageRoom(room, 'Building: ' + build.build_url);
-    }).catch(function(err) {
-      console.log(err);
-      hubot.messageRoom(room, err);
-    });
+    var branch = message.match[3] && message.match[3].replace(/#/g,'');
+    var cache = message.match[4] && message.match[4].indexOf('cache') > -1;
+    var ci = new CircleCI({'auth': env.get(user+'/'+repo+':ciToken') });
+    (cache ? ci.clearBuildCache({username:user,project:repo}) : Promise.resolve())
+      .then(function() {
+        return ci.startBuild({ username: user, project: repo, branch: branch });
+      }).then(function(build) {
+        var msg = 'Building '+(cache?'without cache':'')+': '+build.build_url;
+        console.log(msg);
+        hubot.messageRoom(room, msg);
+      }).catch(function(err) {
+        console.log(err);
+        hubot.messageRoom(room, err);
+      });
   });
 
   hubot.router.post('/hubot/deploy', function(req, res) {
