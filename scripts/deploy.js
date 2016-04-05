@@ -65,9 +65,11 @@ module.exports = function(hubot) {
         var msg = 'Building'+(cache?' without cache':'')+': '+build.build_url;
         console.log(msg);
         hubot.messageRoom(room, msg);
+        if (message.envelope.room !== room) message.send(msg);
       }).catch(function(err) {
         console.log(err);
         hubot.messageRoom(room, err);
+        if (message.envelope.room !== room) message.send(msg);
       });
   });
 
