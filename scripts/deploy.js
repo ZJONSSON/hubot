@@ -62,7 +62,7 @@ module.exports = function(hubot) {
       .then(function() {
         return ci.startBuild({ username: user, project: repo, branch: branch });
       }).then(function(build) {
-        var msg = 'Building '+(cache?'without cache':'')+': '+build.build_url;
+        var msg = 'Building'+(cache?' without cache':'')+': '+build.build_url;
         console.log(msg);
         hubot.messageRoom(room, msg);
       }).catch(function(err) {
