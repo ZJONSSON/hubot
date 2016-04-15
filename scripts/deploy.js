@@ -157,18 +157,19 @@ function deploy(options) {
   res.send('Deploying '+key+(prod?' to PRODUCTION':'')+(server?' via '+server:''));
   
   var destination;
+  var servers = env.get(user+'/'+repo+':server');
   if (prod && branch === releaseBranch) {
-    destination = env.get(user+'/'+repo+':server:prod');
-    server = server || destination;
-    if (env.get(user+'/'+repo+':server:prod2'))
-      destination += ',' + env.get(user+'/'+repo+':server:prod2');
+    server = server || servers.prod[0];
+    destination = servers.prod.join(',');
   }
-  else if (branch === releaseBranch)
-    destination = env.get(user+'/'+repo+':server:stg');
-  else if (env.get(user+'/'+repo+':server:'+branch))
-    destination = env.get(user+'/'+repo+':server:'+branch);
-  else
-    destination = branch+env.get(user+'/'+repo+':server:dev');
+  else if (branch === releaseBranch) {
+    server = server || servers.stg[0];
+    destination = servers.stg.join(',');
+  }
+  else {
+    server = server || branch + servers.dev[0];
+    destination = servers.dev.map(function(d) { return branch + d; }).join(',');
+  }
 
   var NODE_ENV = (branch === releaseBranch) ? 'production' : 'development';
 
@@ -233,7 +234,7 @@ function deploy(options) {
   .then(function(artifact) {
     return execAsync([
       './bin/deploy.sh',
-      server || destination,
+      server,
       destination,
       artifact.build,
       artifact.url,
@@ -286,7 +287,7 @@ function takedown(options) {
     return;
   }
 
-  var destination = branch+env.get(repo+':server:dev');
+  var destination = branch+env.get(repo+':server:dev')[0];
 
   execAsync([
     './bin/takedown.sh',
