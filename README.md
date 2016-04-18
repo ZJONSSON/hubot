@@ -15,5 +15,3 @@
 `heroku config:set HUBOT_SSH_KEY="$(cat id_rsa)" -a APPNAME`
 
 `heroku addons:add redistogo:nano -a APPNAME`
-
-Deployed to heroku. Eventually pushes to master will auto-deploy lol.

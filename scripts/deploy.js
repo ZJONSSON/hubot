@@ -9,8 +9,9 @@
         "releaseBranch": "master",
         "restrictedBranches": [ "stg" ],
         "server": {
-          "dev": "-dev.myhost.com",
-          "prod": "myhost.com"
+          "dev": ["-dev.myhost.com"],
+          "stg": ["stg.myhost.com","stg.myhost.io"],
+          "prod": ["myhost.com","myhost.io"]
         },
         "ciToken": "",
         "rollbarToken": ""
@@ -20,7 +21,8 @@
   Commands:
     hubot deploy user/repo#branch
     hubot deploy user/repo to prod
-    post(/hubot/deploy, { payload: { username: '', reponame: '', branch: '' }, prod: Boolean, server: String })
+    post(/hubot/deploy, { payload: { username: '', reponame: '', branch: '' },
+     prod: Boolean, server: String })
 */
 
 var env = require('nconf').argv().env().file('default', 'config.json');
@@ -107,7 +109,7 @@ module.exports = function(hubot) {
     var repo = message.match[2];
     var branch = message.match[3];
     var prod = message.match[4] && message.match[4].indexOf('to prod') > -1;
-    deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send: function(msg) {
+    deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send:function(msg) {
       console.log(msg);
       hubot.messageRoom(room, msg);
       if (message.envelope.room !== room) message.send(msg);
