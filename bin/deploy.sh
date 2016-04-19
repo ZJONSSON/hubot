@@ -9,8 +9,8 @@ sha=$5
 NODE_ENV=$6
 cores=$7
 
-appFilename=app-$buildNumber
-BASEDIR=/var/ubuntu/apps
+tag=$8
+appFilename=$tag-$buildNumber
 
 echo "Deploying build $buildNumber"
 echo "user=$user"
@@ -18,6 +18,9 @@ echo "server=$server"
 echo "host=$host"
 echo "appDataUrl=$appDataUrl"
 echo "sha=$sha"
+echo "NODE_ENV=$NODE_ENV"
+echo "cores=$cores"
+echo "tag=$tag"
 echo "appFilename=$appFilename"
 
 TEMP=$(mktemp /tmp/id_rsa.XXXXXXXX)
