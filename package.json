@@ -27,7 +27,7 @@
     "hubot-reboot": "^1.0.2",
     "hubot-redis-brain": "0.0.2",
     "hubot-rules": "^0.1.0",
-    "hubot-scripts": "^2.5.16",
+    "hubot-scripts": "2.17.1",
     "hubot-seriouslyguys": "^1.0.0",
     "hubot-shipit": "^0.1.1",
     "hubot-slack": "^3.2.1",
