@@ -12,8 +12,6 @@ cores=$7
 appFilename=app-$buildNumber
 BASEDIR=/var/ubuntu/apps
 
-echo "$HUBOT_SSH_KEY" > /tmp/id_rsa
-
 echo "Deploying build $buildNumber"
 echo "user=$user"
 echo "server=$server"
@@ -22,8 +20,10 @@ echo "appDataUrl=$appDataUrl"
 echo "sha=$sha"
 echo "appFilename=$appFilename"
 
+TEMP=$(mktemp /tmp/id_rsa.XXXXXXXX)
+echo "$HUBOT_SSH_KEY" > $TEMP
 
-ssh $user@$server -i /tmp/id_rsa -o StrictHostKeyChecking=no bash -c "'
+ssh $user@$server -i $TEMP -o StrictHostKeyChecking=no bash -c "'
 export UNPACKED=1
 
 wget -nv -c -t 10 --timeout=60 --waitretry=5 $appDataUrl -O /tmp/app.tar.gz
