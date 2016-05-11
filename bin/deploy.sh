@@ -10,8 +10,6 @@ NODE_ENV=$6
 DOCKERTAG=$7
 LOGTAG=$8
 
-FILENAME=$DOCKERTAG-$BUILD_NUM
-
 echo "Deploying build $BUILD_NUM"
 echo "REMOTEUSER=$REMOTEUSER"
 echo "SERVER=$SERVER"
@@ -21,7 +19,6 @@ echo "SHA=$SHA"
 echo "NODE_ENV=$NODE_ENV"
 echo "DOCKERTAG=$DOCKERTAG"
 echo "LOGTAG=$LOGTAG"
-echo "FILENAME=$FILENAME"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REMOTEDEPLOY=$(<$DIR/remote-deploy.sh)
