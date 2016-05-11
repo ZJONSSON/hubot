@@ -123,11 +123,10 @@ function deploy(options) {
   var repo = options.repo;
   var releaseBranch = env.get(user+'/'+repo+':releaseBranch');
   var branch = (options.branch || releaseBranch).replace(/([^\w\d\s-])/,'');
-  var cores = env.get(user+'/'+repo+':cores:'+branch);
   var prod = options.prod;
   var server = options.server;
   var key = user+'/'+repo+'#'+branch;
-  var tag = user+'-'+repo+':'+branch;
+  var tag = user+'/'+repo+':'+branch;
 
   if (deploySync[key]) return;
   deploySync[key] = true;
@@ -243,7 +242,6 @@ function deploy(options) {
       artifact.url,
       artifact.sha,
       NODE_ENV,
-      cores,
       tag
     ].join(' ')).then(function(res) {
       if (String(res).toLowerCase().indexOf('error')>-1) throw 'Deploy failed: '+res;

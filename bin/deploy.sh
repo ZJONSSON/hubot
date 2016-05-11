@@ -7,9 +7,7 @@ buildNumber=$3
 appDataUrl=$4
 sha=$5
 NODE_ENV=$6
-cores=$7
-
-tag=$8
+tag=$7
 appFilename=$tag-$buildNumber
 
 echo "Deploying build $buildNumber"
@@ -19,7 +17,6 @@ echo "host=$host"
 echo "appDataUrl=$appDataUrl"
 echo "sha=$sha"
 echo "NODE_ENV=$NODE_ENV"
-echo "cores=$cores"
 echo "tag=$tag"
 echo "appFilename=$appFilename"
 
@@ -37,6 +34,6 @@ tar xzf /tmp/app.tar.gz -C /home/ubuntu/builds/$appFilename
 rm -f /tmp/app.tar.gz
 
 mkdir -p /home/ubuntu/logs
-bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $host $NODE_ENV $cores > /home/ubuntu/logs/app-deploy-$host.log 2>&1
+bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $NODE_ENV $tag > /home/ubuntu/logs/app-deploy-$host.log 2>&1
 exit 0
 '"
