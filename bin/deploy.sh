@@ -1,39 +1,50 @@
 #!/bin/bash
 
-user=ubuntu
-server=$1
-host=$2
-buildNumber=$3
-appDataUrl=$4
-sha=$5
+REMOTEUSER=ubuntu
+SERVER=$1
+VIRTUAL_HOST=$2
+BUILD_NUM=$3
+DATA_URL=$4
+SHA=$5
 NODE_ENV=$6
-tag=$7
-appFilename=$tag-$buildNumber
+DOCKERTAG=$7
+LOGTAG=$8
 
-echo "Deploying build $buildNumber"
-echo "user=$user"
-echo "server=$server"
-echo "host=$host"
-echo "appDataUrl=$appDataUrl"
-echo "sha=$sha"
+FILENAME=$DOCKERTAG-$BUILD_NUM
+
+echo "Deploying build $BUILD_NUM"
+echo "REMOTEUSER=$REMOTEUSER"
+echo "SERVER=$SERVER"
+echo "VIRTUAL_HOST=$VIRTUAL_HOST"
+echo "DATA_URL=$DATA_URL"
+echo "SHA=$SHA"
 echo "NODE_ENV=$NODE_ENV"
-echo "tag=$tag"
-echo "appFilename=$appFilename"
+echo "DOCKERTAG=$DOCKERTAG"
+echo "LOGTAG=$LOGTAG"
+echo "FILENAME=$FILENAME"
 
-TEMP=$(mktemp /tmp/id_rsa.XXXXXXXX)
-echo "$HUBOT_SSH_KEY" > $TEMP
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REMOTEDEPLOY=$(<$DIR/remote-deploy.sh)
 
-ssh $user@$server -i $TEMP -o StrictHostKeyChecking=no bash -c "'
+TEMP_KEY=$(mktemp /tmp/XXXXXXXX.id_rsa)
+echo "$HUBOT_SSH_KEY" > $TEMP_KEY
+
+ssh $REMOTEUSER@$SERVER -i $TEMP_KEY -o StrictHostKeyChecking=no bash -c "'
 export UNPACKED=1
 
-wget -nv -c -t 10 --timeout=60 --waitretry=5 $appDataUrl -O /tmp/app.tar.gz
-mkdir -p /home/ubuntu/builds/$appFilename
+TEMP_REMOTEDEPLOY=$(mktemp /tmp/remote-deployXXXXXXXX.sh)
+echo \"$REMOTEDEPLOY\" > $TEMP_REMOTEDEPLOY
+chmod +x $TEMP_REMOTEDEPLOY
 
-echo Unpacking app
-tar xzf /tmp/app.tar.gz -C /home/ubuntu/builds/$appFilename
-rm -f /tmp/app.tar.gz
+TEMP_BUILD=$(mktemp /tmp/buildXXXXXXXX.tar.gz)
+wget -nv -c -t 10 --timeout=60 --waitretry=5 $DATA_URL -O $TEMP_BUILD
 
 mkdir -p /home/ubuntu/logs
-bash builds/$appFilename/deploy/remote-deploy.sh $appFilename $host $NODE_ENV $tag > /home/ubuntu/logs/app-deploy-$host.log 2>&1
+
+bash $TEMP_REMOTEDEPLOY $TEMP_BUILD $VIRTUAL_HOST $NODE_ENV $DOCKERTAG $LOGTAG \
+  > /home/ubuntu/logs/app-deploy-$host.log 2>&1
+
+rm -f $TEMP_BUILD
+
 exit 0
 '"
