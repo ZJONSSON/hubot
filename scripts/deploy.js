@@ -213,8 +213,7 @@ function deploy(options) {
     var buildNumber = build.build_num;
 
     return artifacts.filter(function(artifact) {
-      // TODO: filter out just the build artifacts
-      return true;
+      return artifact.pretty_path.indexOf('dist.tar.gz') > -1;
     }).map(function(artifact) {
       var name = artifact.pretty_path.split('/').pop();
       var nameParts = name.split('-');
