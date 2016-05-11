@@ -37,7 +37,7 @@ echo \"$REMOTEDEPLOY\" > $TEMP_REMOTEDEPLOY
 chmod +x $TEMP_REMOTEDEPLOY
 
 TEMP_BUILD=$(mktemp /tmp/buildXXXXXXXX.tar.gz)
-wget -nv -c -t 10 --timeout=60 --waitretry=5 $DATA_URL -O $TEMP_BUILD
+wget -nv -c -t 10 --timeout=60 --waitretry=5 $DATA_URL -O - >> $TEMP_BUILD
 
 mkdir -p /home/ubuntu/logs
 
