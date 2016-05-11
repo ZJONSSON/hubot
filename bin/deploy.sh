@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REMOTEUSER=ubuntu
+REMOTE_USER=ubuntu
 SERVER=$1
 VIRTUAL_HOST=$2
 BUILD_NUM=$3
@@ -11,7 +11,7 @@ DOCKERTAG=$7
 LOGTAG=$8
 
 echo "Deploying build $BUILD_NUM"
-echo "REMOTEUSER=$REMOTEUSER"
+echo "REMOTE_USER=$REMOTE_USER"
 echo "SERVER=$SERVER"
 echo "VIRTUAL_HOST=$VIRTUAL_HOST"
 echo "DATA_URL=$DATA_URL"
@@ -20,26 +20,27 @@ echo "NODE_ENV=$NODE_ENV"
 echo "DOCKERTAG=$DOCKERTAG"
 echo "LOGTAG=$LOGTAG"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REMOTEDEPLOY=$(<$DIR/remote-deploy.sh)
-
 TEMP_KEY=$(mktemp /tmp/XXXXXXXX.id_rsa)
 echo "$HUBOT_SSH_KEY" > $TEMP_KEY
 
-ssh $REMOTEUSER@$SERVER -i $TEMP_KEY -o StrictHostKeyChecking=no bash -c "'
+TEMP_BUILD="/tmp/`echo $RANDOM$RANDOM`build.tar.gz"
+
+REMOTE_DEPLOY="/tmp/`echo $RANDOM$RANDOM`remote-deploy.sh"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $TEMP_KEY \
+  $DIR/remote-deploy.sh $REMOTE_USER@$SERVER:$REMOTE_DEPLOY
+
+ssh $REMOTE_USER@$SERVER -i $TEMP_KEY -o StrictHostKeyChecking=no bash -c "'
 export UNPACKED=1
 
-TEMP_REMOTEDEPLOY=$(mktemp /tmp/remote-deployXXXXXXXX.sh)
-echo \"$REMOTEDEPLOY\" > $TEMP_REMOTEDEPLOY
-chmod +x $TEMP_REMOTEDEPLOY
+chmod +x $REMOTE_DEPLOY
 
-TEMP_BUILD=$(mktemp /tmp/buildXXXXXXXX.tar.gz)
-wget -nv -c -t 10 --timeout=60 --waitretry=5 $DATA_URL -O - >> $TEMP_BUILD
+wget -nv -c -t 10 --timeout=60 --waitretry=5 $DATA_URL -O $TEMP_BUILD
 
 mkdir -p /home/ubuntu/logs
 
-bash $TEMP_REMOTEDEPLOY $TEMP_BUILD $VIRTUAL_HOST $NODE_ENV $DOCKERTAG $LOGTAG \
-  > /home/ubuntu/logs/app-deploy-$host.log 2>&1
+bash $REMOTE_DEPLOY $TEMP_BUILD $VIRTUAL_HOST $NODE_ENV $DOCKERTAG $LOGTAG \
+  > /home/ubuntu/logs/app-deploy-$VIRTUAL_HOST.log 2>&1
 
 rm -f $TEMP_BUILD
 

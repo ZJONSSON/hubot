@@ -9,9 +9,9 @@ LOGTAG=$5
 echo Loading docker image
 gunzip -c $FILENAME | docker load
 
-echo Running build
+echo Running docker image
 PREVBUILD=`docker ps -q --filter label=name=$VIRTUAL_HOST_CLEAN`
-CURRENTBUILD=`docker run -d --restart=on-failure:10 -v /home/ubuntu/config:/usr/src/app/server/config -v /home/ubuntu/cert:/usr/src/app/cert -e NODE_ENV=$NODE_ENV -e VIRTUAL_HOST=$VIRTUAL_HOST --log-driver syslog --log-opt tag="app/$REPONAME/$BRANCHNAME/$REV" --label name=$VIRTUAL_HOST_CLEAN $TAG`
+CURRENTBUILD=`docker run -d --restart=on-failure:10 -v /home/ubuntu/config:/usr/src/app/server/config -v /home/ubuntu/cert:/usr/src/app/cert -e NODE_ENV=$NODE_ENV -e VIRTUAL_HOST=$VIRTUAL_HOST --log-driver syslog --log-opt tag="$LOGTAG" --label name=$VIRTUAL_HOST_CLEAN $DOCKERTAG`
 echo Ran $CURRENTBUILD
 sleep 2
 docker stop $PREVBUILD 2>/dev/null && docker rm $PREVBUILD 2>/dev/null
