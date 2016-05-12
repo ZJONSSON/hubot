@@ -227,17 +227,16 @@ function deploy(options) {
     }, {});
   })
   .then(function(artifacts) {
-    var artifact = artifacts.dist;
     return execAsync([
       './bin/deploy.sh',
       server,
       destination,
-      artifact.buildNumber,
-      artifact.url,
-      artifact.sha,
+      artifacts.dist.buildNumber,
+      artifacts.dist.url,
+      artifacts.dist.sha,
       NODE_ENV,
       dockertag,
-      logtag + artifact.sha
+      logtag + artifacts.dist.sha
     ].join(' ')).then(function(res) {
       if (String(res).toLowerCase().indexOf('error')>-1) throw 'Deploy failed:\n'+res;
       return artifacts;
@@ -250,7 +249,7 @@ function deploy(options) {
       './bin/rollbar.sh',
       env.get(user+'/'+repo+':rollbarToken'),
       branch === releaseBranch ? (prod?'production':'staging') : branch,
-      artifact.sha
+      artifacts.dist.sha
     ].join(' ')).then(function() { return artifacts; });
   })
   .then(function(artifacts) {
@@ -261,6 +260,7 @@ function deploy(options) {
     return execAsync([
       './bin/test.sh',
       artifacts.src.url,
+      artifacts.src.sha,
       destination,
       NODE_ENV
     ].join(' ')).then(function(res) {
