@@ -262,7 +262,8 @@ function deploy(options) {
       artifacts.src.url,
       artifacts.src.sha,
       destination,
-      NODE_ENV
+      NODE_ENV,
+      repo
     ].join(' ')).then(function(res) {
       if (String(res).toLowerCase().indexOf('error')>-1)
         throw 'Test failed for '+destination+' \n'+res;
