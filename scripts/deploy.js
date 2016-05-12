@@ -33,6 +33,7 @@ var Promise = require('bluebird');
 var execAsync = Promise.promisify(require('child_process').exec);
 var deploySync = {};
 var takedownSync = {};
+var testSync = {};
 
 module.exports = function(hubot) {
   hubot.router.post('/hubot/takedown', function(req, res) {
@@ -54,6 +55,19 @@ module.exports = function(hubot) {
       if (message.envelope.room !== room) message.send(msg);
     }}});
   });
+
+  hubot.respond(/test (\S[^\/]+)\/(\S[^#\s]+)(#*\S*)([\S\s]*)/i, function(message) {
+    var user = message.match[1];
+    var repo = message.match[2];
+    var branch = message.match[3] && message.match[3].replace(/#/g,'');
+    var extra = message.match[4] && message.match[4].indexOf('extra') > -1;
+    test({ user:user, repo:repo, branch:branch, res:{ send:function(msg) {
+      console.log(msg);
+      hubot.messageRoom(room, msg);
+      if (message.envelope.room !== room) message.send(msg);
+    }}});
+  });
+
   hubot.respond(/build (\S[^\/]+)\/(\S[^#\s]+)(#*\S*)([\S\s]*)/i, function(message) {
     var user = message.match[1];
     var repo = message.match[2];
@@ -176,55 +190,10 @@ function deploy(options) {
 
   var NODE_ENV = (branch === releaseBranch) ? 'production' : 'development';
 
-  var ci = new CircleCI({
-    'auth': env.get(user+'/'+repo+':ciToken')
-  });
-
-  return ci.getBuilds({
-    'username': user,
-    'project': repo
-  })
-  .then(function(builds) {
-    if (builds.message === 'Project not found') throw 'ciToken invalid';
-
-    var build = builds.filter && builds.filter(function(d) {
-      return d.branch === branch && d.outcome === 'success';
-    }).shift();
-
-    if (!build) throw 'Failed to find successful build';
-
-    return build;
-  })
-  .then(function(build) {
-    return new Promise(function(resolve, reject) {
-      ci.getBuildArtifacts({
-        'username': user,
-        'project': repo,
-        'build_num': build.build_num
-      }).then(function(artifacts) {
-        resolve([artifacts, build]);
-      });
-    });
-  })
-  .spread(function(artifacts, build) {
-    if (!artifacts || !artifacts.length) throw 'Failed to find artifacts';
-    return artifacts.filter(function(artifact) {
-      return artifact.pretty_path.indexOf(repo) > -1;
-    }).map(function(artifact) {
-      artifact.url = artifact.url + '?circle-token=' + env.get(user+'/'+repo+':ciToken');
-      artifact.sha = build.vcs_revision;
-      artifact.buildNumber = build.build_num;
-      return artifact;
-    });
-  })
-  .then(function(artifacts) {
-    if (!artifacts.length)
-      throw 'Failed to find necessary artifacts';
-    return artifacts.reduce(function(o, d) {
-      if (d.pretty_path.indexOf('src') > -1) o.src = d;
-      else if (d.pretty_path.indexOf('dist') > -1) o.dist = d;
-      return o;
-    }, {});
+  return getArtifacts({
+    user: user,
+    repo: repo,
+    branch: branch
   })
   .then(function(artifacts) {
     return execAsync([
@@ -261,7 +230,7 @@ function deploy(options) {
       './bin/test.sh',
       artifacts.src.url,
       artifacts.src.sha,
-      destination,
+      server,
       NODE_ENV,
       repo
     ].join(' ')).then(function(res) {
@@ -276,6 +245,62 @@ function deploy(options) {
   .catch(function(err) {
     res.send('Deployment failed: '+err);
     delete deploySync[key];
+  });
+}
+
+function test(options) {
+  var res = options.res;
+  var user = options.user;
+  var repo = options.repo;
+  var releaseBranch = env.get(user+'/'+repo+':releaseBranch');
+  var branch = (options.branch || releaseBranch).replace(/([^\w\d\s-])/,'');
+  var key = user+'/'+repo+'#'+branch;
+  var NODE_ENV = (branch === releaseBranch) ? 'production' : 'development';
+  var server;
+  var servers = env.get(user+'/'+repo+':server');
+  if (prod && branch === releaseBranch)
+    server = server || servers.prod[0];
+  else if (branch === releaseBranch)
+    server = server || servers.stg[0];
+  else
+    server = server || branch + servers.dev[0];
+
+  if (testSync[key]) return;
+  testSync[key] = true;
+
+  if (!env.get(user+'/'+repo)) {
+    res.send(user+'/'+repo+' not found in config');
+    delete testSync[key];
+    return;
+  }
+  return getArtifacts({
+    user: user,
+    repo: repo,
+    branch: branch
+  })
+  .then(function(artifacts) {
+    if (!env.get(user+'/'+repo+':test:'+branch))
+      return;
+    res.send('Testing: '+destination);
+    return execAsync([
+      './bin/test.sh',
+      artifacts.src.url,
+      artifacts.src.sha,
+      destination,
+      NODE_ENV,
+      repo
+    ].join(' ')).then(function(res) {
+      if (String(res).toLowerCase().indexOf('error')>-1)
+        throw res;
+    });
+  })
+  .then(function() {
+    res.send('Test passed for '+destination);
+    delete testSync[key];
+  })
+  .catch(function(err) {
+    res.send('Test failed for '+destination+': \n'+err);
+    delete testSync[key];
   });
 }
 
@@ -314,5 +339,53 @@ function takedown(options) {
   }).catch(function(err) {
     res.send('Error taking down ' + key + ' : ' + err); 
     delete takedownSync[key];
+  });
+}
+
+function getArtifacts(options) {
+  var ci = new CircleCI({'auth':env.get(options.user+'/'+options.repo+':ciToken')});
+  return ci.getBuilds({
+    'username': options.user,
+    'project': options.repo
+  })
+  .then(function(builds) {
+    if (builds.message === 'Project not found') throw 'ciToken invalid';
+    var build = builds.filter && builds.filter(function(d) {
+      return d.branch === options.branch && d.outcome === 'success';
+    }).shift();
+    if (!build) throw 'Failed to find successful build';
+    return build;
+  })
+  .then(function(build) {
+    return new Promise(function(resolve, reject) {
+      ci.getBuildArtifacts({
+        'username': options.user,
+        'project': options.repo,
+        'build_num': build.build_num
+      }).then(function(artifacts) {
+        resolve([artifacts, build]);
+      });
+    });
+  })
+  .spread(function(artifacts, build) {
+    if (!artifacts || !artifacts.length) throw 'Failed to find artifacts';
+    return artifacts.filter(function(artifact) {
+      return artifact.pretty_path.indexOf(options.repo) > -1;
+    }).map(function(artifact) {
+      artifact.url = artifact.url + '?circle-token=' +
+        env.get(options.user+'/'+options.repo+':ciToken');
+      artifact.sha = build.vcs_revision;
+      artifact.buildNumber = build.build_num;
+      return artifact;
+    });
+  })
+  .then(function(artifacts) {
+    if (!artifacts.length)
+      throw 'Failed to find necessary artifacts';
+    return artifacts.reduce(function(o, d) {
+      if (d.pretty_path.indexOf('src') > -1) o.src = d;
+      else if (d.pretty_path.indexOf('dist') > -1) o.dist = d;
+      return o;
+    }, {});
   });
 }
