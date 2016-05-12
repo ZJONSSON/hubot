@@ -208,48 +208,42 @@ function deploy(options) {
   })
   .spread(function(artifacts, build) {
     if (!artifacts || !artifacts.length) throw 'Failed to find artifacts';
-
-    var sha = build.vcs_revision;
-    var buildNumber = build.build_num;
-
     return artifacts.filter(function(artifact) {
-      return artifact.pretty_path.indexOf('dist.tar.gz') > -1;
+      return artifact.pretty_path.indexOf(repo) > -1;
     }).map(function(artifact) {
-      var name = artifact.pretty_path.split('/').pop();
-      var nameParts = name.split('-');
-      var component = nameParts[0];
-      var buildEnv = nameParts[1];
-      return {
-        'url': artifact.url + '?circle-token=' + env.get(user+'/'+repo+':ciToken'),
-        'build': buildNumber,
-        'sha': sha,
-        'component': component,
-        'env': buildEnv
-      };
+      artifact.url = artifact.url + '?circle-token=' + env.get(user+'/'+repo+':ciToken');
+      artifact.sha = build.vcs_revision;
+      artifact.buildNumber = build.build_num;
+      return artifact;
     });
   })
   .then(function(artifacts) {
-    var artifact = artifacts.pop();
-    if (!artifact) throw 'Could not find necessary artifacts';
-    return artifact;
+    if (!artifacts.length)
+      throw 'Failed to find necessary artifacts';
+    return artifacts.reduce(function(o, d) {
+      if (d.pretty_path.indexOf('src') > -1) o.src = d;
+      else if (d.pretty_path.indexOf('dist') > -1) o.dist = d;
+      return o;
+    }, {});
   })
-  .then(function(artifact) {
+  .then(function(artifacts) {
+    var artifact = artifacts.dist;
     return execAsync([
       './bin/deploy.sh',
       server,
       destination,
-      artifact.build,
+      artifact.buildNumber,
       artifact.url,
       artifact.sha,
       NODE_ENV,
       dockertag,
       logtag + artifact.sha
     ].join(' ')).then(function(res) {
-      if (String(res).toLowerCase().indexOf('error')>-1) throw 'Deploy failed: '+res;
-      return artifact;
+      if (String(res).toLowerCase().indexOf('error')>-1) throw 'Deploy failed:\n'+res;
+      return artifacts;
     });
   })
-  .then(function(artifact) {
+  .then(function(artifacts) {
     if (!env.get(user+'/'+repo+':rollbarToken'))
       return res.send('rollbarToken missing for '+user+'/'+repo);
     return execAsync([
@@ -257,10 +251,25 @@ function deploy(options) {
       env.get(user+'/'+repo+':rollbarToken'),
       branch === releaseBranch ? (prod?'production':'staging') : branch,
       artifact.sha
-    ].join(' '));
+    ].join(' ')).then(function() { return artifacts; });
+  })
+  .then(function(artifacts) {
+    res.send('Deployed: '+destination);
+    if (!env.get(user+'/'+repo+':test:'+branch))
+      return;
+    res.send('Testing: '+destination);
+    return execAsync([
+      './bin/test.sh',
+      artifacts.src.url,
+      destination,
+      NODE_ENV
+    ].join(' ')).then(function(res) {
+      if (String(res).toLowerCase().indexOf('error')>-1)
+        throw 'Test failed for '+destination+' \n'+res;
+      res.send('Test passed for '+destination);
+    });
   })
   .then(function() {
-    res.send('Deployed: '+destination);
     delete deploySync[key];
   })
   .catch(function(err) {
