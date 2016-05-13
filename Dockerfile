@@ -1,7 +1,9 @@
 FROM node:5.5.0
 MAINTAINER Harrison Powers, harrisonpowers@gmail.com
 
-RUN apt update && apt install vim xvfb openjdk-7-jre -y
+RUN echo "deb http://packages.linuxmint.com debian import" | tee -a /etc/apt/sources.list
+RUN apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3EE67F3D0FF405B2
+RUN apt update && apt install vim xvfb openjdk-7-jre firefox -y
 
 RUN npm i -g coffee-script
 
