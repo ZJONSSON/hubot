@@ -233,9 +233,9 @@ function deploy(options) {
       server,
       NODE_ENV,
       repo
-    ].join(' ')).then(function(res) {
-      if (String(res).toLowerCase().indexOf('error')>-1)
-        throw 'Test failed for '+destination+' \n'+res;
+    ].join(' ')).then(function(resp) {
+      if (String(resp).toLowerCase().indexOf('error')>-1)
+        throw 'Test failed for '+destination+' \n'+resp;
       res.send('Test passed for '+destination);
     });
   })
