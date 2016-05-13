@@ -47,3 +47,4 @@ rm -f $TEMP_REMOTE_DEPLOY
 
 exit 0
 '"
+rm -f $TEMP_KEY

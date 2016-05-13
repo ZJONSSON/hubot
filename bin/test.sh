@@ -18,6 +18,7 @@ echo "NODE_ENV=$NODE_ENV"
 echo "TEMP_BUILD=$TEMP_BUILD"
 echo "CERT=$CERT"
 echo "KEY=$KEY"
+
 REV=$(wget -nv -c -t 10 --timeout=60 --waitretry=5 \
   --certificate $CERT --private-key $KEY $TEST_ROOT/auth/rev -O -)
 if [ -z "${REV##*$DATA_SHA*}" ] ; then
