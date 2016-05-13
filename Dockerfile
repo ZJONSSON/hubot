@@ -1,6 +1,8 @@
 FROM node:5.5.0
 MAINTAINER Harrison Powers, harrisonpowers@gmail.com
 
+RUN apt update && apt install vim xvfb -y
+
 RUN npm i -g coffee-script
 
 COPY . /usr/src/app
