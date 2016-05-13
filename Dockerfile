@@ -1,7 +1,7 @@
 FROM node:5.5.0
 MAINTAINER Harrison Powers, harrisonpowers@gmail.com
 
-RUN apt update && apt install vim xvfb -y
+RUN apt update && apt install vim xvfb openjdk-7-jre -y
 
 RUN npm i -g coffee-script
 
