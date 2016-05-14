@@ -32,8 +32,8 @@ mkdir -p $TEMP_BUILD
 tar xzf $TEMP_BUILD.tar.gz -C $TEMP_BUILD
 
 mkdir -p $TEMP_BUILD/certs
-cp -r $PARENT_DIR/certs/$REPONAME* $TEMP_BUILD/certs
-cp $PARENT_DIR/firefox_profiles/$REPONAME $TEMP_BUILD/certs/firefox-profile
+cp -r $PARENT_DIR/certs/$REPONAME* $TEMP_BUILD/selenium/certs
+cp $PARENT_DIR/firefox_profiles/$REPONAME $TEMP_BUILD/selenium/certs/firefox-profile
 
 cd $TEMP_BUILD
 npm run hubot-test
