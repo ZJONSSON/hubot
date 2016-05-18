@@ -4,7 +4,7 @@ set -e
 
 DATA_URL=$1
 DATA_SHA=$2
-TEST_ROOT=$3
+export TEST_ROOT="https://$3"
 NODE_ENV=$4
 REPONAME=$5
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
