@@ -1,9 +1,11 @@
-FROM node:5.5.0
+FROM ubuntu:14.04.3
+
 MAINTAINER Harrison Powers, harrisonpowers@gmail.com
 
-RUN echo "deb http://packages.linuxmint.com debian import" | tee -a /etc/apt/sources.list
-RUN apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3EE67F3D0FF405B2
-RUN apt update && apt install vim xvfb openjdk-7-jre firefox -y
+RUN sudo apt-get install -y curl && curl -sL https://deb.nodesource.com/setup | sudo bash -
+
+RUN sudo apt-get update && apt-get install -y --no-install-recommends \
+  nodejs vim xvfb openjdk-7-jre firefox build-essential wget openssh-client
 
 RUN npm i -g coffee-script
 
