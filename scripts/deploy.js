@@ -237,7 +237,7 @@ function deploy(options) {
       if (String(resp).toLowerCase().indexOf('error')>-1)
         throw 'Test failed for '+destination+' \n'+resp;
       res.send('Test passed for '+destination);
-    });
+    }).catch(function(err) { throw 'Test failed for '+destination+' \n'+err; });
   })
   .then(function() {
     delete deploySync[key];
