@@ -13,7 +13,7 @@ TEMP_BUILD="/tmp/`echo $RANDOM$RANDOM`build"
 CERT="$PARENT_DIR/certs/${REPONAME}-${NODE_ENV}-a.crt"
 KEY="$PARENT_DIR/certs/${REPONAME}-${NODE_ENV}-a.key"
 
-echo "Testing $TEST_ROOT"
+echo "TEST_ROOT=$TEST_ROOT"
 echo "DATA_URL=$DATA_URL"
 echo "DATA_SHA=$DATA_SHA"
 echo "NODE_ENV=$NODE_ENV"
