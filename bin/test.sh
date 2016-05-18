@@ -33,7 +33,7 @@ curl --silent --connect-timeout 60 --retry-delay 5 $DATA_URL -o $TEMP_BUILD.tar.
 mkdir -p $TEMP_BUILD
 tar xzf $TEMP_BUILD.tar.gz -C $TEMP_BUILD
 
-mkdir -p $TEMP_BUILD/certs
+mkdir -p $TEMP_BUILD/selenium/certs
 cp -r $PARENT_DIR/certs/$REPONAME* $TEMP_BUILD/selenium/certs
 cp $PARENT_DIR/firefox_profiles/${REPONAME}.js $TEMP_BUILD/selenium/certs/firefox-profile.js
 
