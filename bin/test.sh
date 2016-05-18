@@ -22,7 +22,8 @@ echo "CERT=$CERT"
 echo "KEY=$KEY"
 
 REV=$(wget -nv -c -t 10 --timeout=60 --waitretry=5 \
-  --certificate $CERT --private-key $KEY $TEST_ROOT/auth/rev -O -)
+  --certificate $CERT --private-key $KEY $TEST_ROOT/auth/rev -O - 2>/dev/null)
+echo "REV=$REV"
 if [ -z "${REV##*$DATA_SHA*}" ] ; then
   echo "Rev match"
 else
