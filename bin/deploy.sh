@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 REMOTE_USER=ubuntu
 SERVER=$1
 VIRTUAL_HOST=$2

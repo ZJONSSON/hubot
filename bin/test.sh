@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 DATA_URL=$1
 DATA_SHA=$2
 TEST_ROOT=$3
