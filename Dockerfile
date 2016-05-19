@@ -6,7 +6,7 @@ RUN sudo apt-get update && apt-get install -y curl && \
   curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
 
 RUN sudo apt-get update && apt-get install -y --no-install-recommends \
-  nodejs vim xvfb openjdk-7-jre firefox build-essential wget openssh-client
+  nodejs vim xvfb x11vnc openjdk-7-jre firefox build-essential wget openssh-client
 
 RUN npm i -g coffee-script
 
