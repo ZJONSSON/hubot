@@ -90,6 +90,7 @@ module.exports = function(hubot) {
   });
 
   hubot.router.post('/hubot/deploy', function(req, res) {
+    res.send('OK');
     var user = req.body.payload.username;
     var repo = req.body.payload.reponame;
     var branch = req.body.payload.branch;
@@ -116,7 +117,6 @@ module.exports = function(hubot) {
         hubot.messageRoom(room, msg);
       }}});
     }
-    res.send('OK');
   });
   hubot.respond(/deploy (\S[^\/]+)\/(\S[^#\s]+)(#*\S*)([\S\s]*)/i, function(message) {
     var user = message.match[1];
