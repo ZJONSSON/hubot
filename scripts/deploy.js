@@ -41,7 +41,7 @@ module.exports = function(hubot) {
     var branch = req.body.ref && req.body.ref.replace(/refs\/heads\//,'');
     takedown({ repo:repo, branch:branch, res:{ send:function(msg) {
       console.log(msg);
-      hubot.messageRoom(room, msg);
+      sendMessage(room, msg);
     }}});
     res.send('OK');
   });
@@ -51,7 +51,7 @@ module.exports = function(hubot) {
     var branch = message.match[3];
     takedown({ repo:user+'/'+repo, branch:branch, res:{ send:function(msg) {
       console.log(msg);
-      hubot.messageRoom(room, msg);
+      sendMessage(room, msg);
       if (message.envelope.room !== room) message.send(msg);
     }}});
   });
@@ -63,7 +63,7 @@ module.exports = function(hubot) {
     var extra = message.match[4] && message.match[4].indexOf('extra') > -1;
     test({ user:user, repo:repo, branch:branch, res:{ send:function(msg) {
       console.log(msg);
-      hubot.messageRoom(room, msg);
+      sendMessage(room, msg);
       if (message.envelope.room !== room) message.send(msg);
     }}});
   });
@@ -80,11 +80,11 @@ module.exports = function(hubot) {
       }).then(function(build) {
         var msg = 'Building'+(cache?' without cache':'')+': '+build.build_url;
         console.log(msg);
-        hubot.messageRoom(room, msg);
+        sendMessage(room, msg);
         if (message.envelope.room !== room) message.send(msg);
       }).catch(function(err) {
         console.log(err);
-        hubot.messageRoom(room, err);
+        sendMessage(room, msg);
         if (message.envelope.room !== room) message.send(msg);
       });
   });
@@ -100,7 +100,7 @@ module.exports = function(hubot) {
       var msg = 'Build failed for '+user+'/'+repo+'#'+branch+' '+req.body.payload.build_url;
       if (req.body.payload.why === 'retry') {
         console.log(msg);
-        hubot.messageRoom(room, msg);
+        sendMessage(room, msg);
       } else {
         var ci = new CircleCI({'auth': env.get(user+'/'+repo+':ciToken') });
         ci.clearBuildCache({ username: user, project: repo }).then(function() {
@@ -108,13 +108,13 @@ module.exports = function(hubot) {
         }).then(function(build) {
           msg += '\nRetrying without cache ' + build.build_url;
           console.log(msg);
-          hubot.messageRoom(room, msg);
+          sendMessage(room, msg);
         });
       }
     } else {
       deploy({ user:user, repo:repo, branch:branch, server:server, prod:prod, res:{ send:function(msg) {
         console.log(msg);
-        hubot.messageRoom(room, msg);
+        sendMessage(room, msg);
       }}});
     }
   });
@@ -125,7 +125,7 @@ module.exports = function(hubot) {
     var prod = message.match[4] && message.match[4].indexOf('to prod') > -1;
     deploy({ user:user, repo:repo, branch:branch, prod:prod, res:{ send:function(msg) {
       console.log(msg);
-      hubot.messageRoom(room, msg);
+      sendMessage(room, msg);
       if (message.envelope.room !== room) message.send(msg);
     }}});
   });
@@ -387,5 +387,19 @@ function getArtifacts(options) {
       else if (d.pretty_path.indexOf('dist') > -1) o.dist = d;
       return o;
     }, {});
+  });
+}
+
+// to avoid socket issues, just open a new connection per message
+function sendMessage(channel, msg) {
+  return new Promise(function(resolve, reject) {
+    var rtm = new (require('@slack/client').RtmClient)(env.get(user+'/'+repo+':ciToken'), {
+        logLevel: 'debug'
+      });
+    rtm.start();
+    var events = require('@slack/client').CLIENT_EVENTS;
+    rtm.on(events.RTM.RTM_CONNECTION_OPENED, () =>
+      rtm.sendMessage(msg, channel, () => rtm.disconnect()));
+    rtm.on(events.RTM.DISCONNECT, () => resolve());
   });
 }
