@@ -1,5 +1,9 @@
 ## Hubot
 
+[![CircleCI](https://img.shields.io/circleci/project/fijimunkii/hubot.svg?maxAge=2592000)](https://circleci.com/gh/fijimunkii/hubot)
+[![Docker Stars](https://img.shields.io/docker/stars/fijimunkii/hubot.svg?maxAge=2592000)](hub.docker.com/r/fijimunkii/hubot/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/fijimunkii/hubot.svg?maxAge=2592000)](hub.docker.com/r/fijimunkii/hubot/)
+
 `cp config.json ./`
 
 `heroku create APPNAME`
